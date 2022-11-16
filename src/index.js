@@ -1,0 +1,20 @@
+const express = require("express");
+const bodyParser = require('body-parser');
+const cors = require("cors");
+const helmet = require("helmet");
+const AssessmentRouter = require("./routes/AssessmentRouter");
+const AdminRouter = require("./routes/AdminRouter");
+
+const app = express();
+app.use(cors());
+app.use(helmet());
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+
+const port = process.env.PORT || 3000;
+app.use("/assessment", AssessmentRouter);
+app.use("/admin", AdminRouter);
+
+app.listen(port, () => {
+  console.log(`App listening on port ${port}`);
+});
