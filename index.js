@@ -2,8 +2,8 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const cors = require("cors");
 const helmet = require("helmet");
-const AssessmentRouter = require("./routes/AssessmentRouter");
-const AdminRouter = require("./routes/AdminRouter");
+const AssessmentRouter = require("./src/routes/AssessmentRouter");
+const AdminRouter = require("./src/routes/AdminRouter");
 
 const app = express();
 app.use(cors());
