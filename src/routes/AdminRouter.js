@@ -3,7 +3,7 @@ const AdminController = require("../controllers/AdminController");
 
 const router = express.Router();
 
-router.post("/update", AdminController.handleChangeOnAssessmentQuestion("update"));
-router.post("/delete", AdminController.handleChangeOnAssessmentQuestion("delete"));
+router.post("/update", AdminController.clearAssessmentCache);
+router.post("/delete", AdminController.clearAssessmentCache);
 
 module.exports = router;
