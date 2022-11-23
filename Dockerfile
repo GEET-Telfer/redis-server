@@ -1,4 +1,8 @@
 FROM node:lts-alpine
+
+ARG port
+ENV PORT $port
+
 WORKDIR /src
 COPY ["package.json", "./"]
 RUN ["npm", "install"]
