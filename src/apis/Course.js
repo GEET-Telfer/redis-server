@@ -1,8 +1,10 @@
 const axios = require("axios");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const type = "course";
 const version = "v1";
-const endpoint = `http://localhost/wp-json/${type}/${version}`;
+const endpoint = `${process.env.LOCALHOST_ENDPOINT}/${type}/${version}`;
 
 const fetchAllCourses = async () => {
   const apiRes = await axios.get(`${endpoint}/find-all`);
