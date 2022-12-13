@@ -1,22 +1,27 @@
 const CourseApis = require("../apis/Course");
 const redisClient = require("../redis");
 
+const courseClientKey = "course";
+const courseAllKey = "course-all";
+
+/**
+ * Fetch all the published courses
+ */
 const getAllCourses = async (req, res) => {
-  const key = "course-all";
   let results;
   try {
-    const cacheResults = await redisClient.get(key);
+    const cacheResults = await redisClient.get(courseAllKey);
     if (cacheResults) {
       results = JSON.parse(cacheResults);
-      console.log(`Get cache: ${key}`);
+      console.log(`Get cache: ${courseAllKey}`);
     } else {
       results = await CourseApis.fetchAllCourses();
       results = results.data;
       if (results.length === 0) {
         throw "API returned an empty array";
       }
-      await redisClient.set(key, JSON.stringify(results));
-      console.log(`Set cache: ${key}`);
+      await redisClient.set(courseAllKey, JSON.stringify(results));
+      console.log(`Set cache: ${courseAllKey}`);
     }
 
     res.send(results);
@@ -26,9 +31,12 @@ const getAllCourses = async (req, res) => {
   }
 };
 
+/**
+ * Fetch course by id
+ */
 const getCourseById = async (req, res) => {
   const id = req.query?.id;
-  const key = `course-${id}`;
+  const key = `${courseClientKey}-${id}`;
   let results;
   try {
     const cacheResults = await redisClient.get(key);
