@@ -10,13 +10,22 @@ const courseAllKey = "course-all";
 const courseAdminKey = "course-admin";
 
 /**
- * Notify redis server to clear assessment cache when delete/update operation is called in database
+ * Notify redis server to clear cache when delete/update operation is called in database
  */
 const deleteCache = async (key) => {
   await redisClient.del(assessmentClientKey);
   console.log(`Del cache: ${key}`);
 };
 
+/**
+ * Send err message back to the client
+ */
+const handleErrStatus = (res, err) => {
+  const statusCode = err.response.status;
+  const message = err.response.data.data;
+  console.error(err);
+  res.status(statusCode).send(message);
+}
 /**
  * Create assessment question
  */
@@ -34,8 +43,7 @@ const createAssessment = async (req, res) => {
     deleteCache(assessmentAdminKey);
     res.sendStatus(200);
   } catch (err) {
-    console.error(err);
-    res.status(400).send(result);
+    handleErrStatus(res, err);
   }
 };
 
@@ -58,8 +66,7 @@ const updateAssessment = async (req, res) => {
 
     res.sendStatus(200);
   } catch (err) {
-    console.error(err);
-    res.status(400).send(result);
+    handleErrStatus(res, err);
   }
 };
 
@@ -80,7 +87,7 @@ const deleteAssessment = async (req, res) => {
 
     res.sendStatus(200);
   } catch (err) {
-    console.error(err);
+    handleErrStatus(res, err);
   }
 };
 
@@ -104,9 +111,8 @@ const fetchAssessmentQuestions4Admin = async (req, res) => {
     }
 
     res.send(results);
-  } catch (error) {
-    console.error(error);
-    res.status(404).send("Data unavailable");
+  } catch (err) {
+    handleErrStatus(res, err);
   }
 }
 
@@ -130,8 +136,7 @@ const createCourse = async (req, res) => {
 
     res.sendStatus(200);
   } catch (err) {
-    console.error(err);
-    res.status(400).send(result);
+    handleErrStatus(res, err);
   }
 
 };
@@ -164,7 +169,8 @@ const updateCourse = async (req, res) => {
     res.sendStatus(200);
   } catch (err) {
     console.error(err);
-    res.status(400).send(result);
+    handleErrStatus(res, err);
+;
   }
 };
 
@@ -194,8 +200,7 @@ const deleteCourse = async (req, res) => {
 
     res.sendStatus(200);
   } catch (err) {
-    console.error(err);
-    res.status(400).send(result);
+    handleErrStatus(res, err);
   }
 };
 
@@ -219,9 +224,9 @@ const fetchCourses4Admin = async (req, res) => {
     }
 
     res.send(results);
-  } catch (error) {
-    console.error(error);
-    res.status(404).send("Data unavailable");
+  } catch (err) {
+    // res.status(404).send("Data unavailable");
+    handleErrStatus(res, err);
   }
 }
 
