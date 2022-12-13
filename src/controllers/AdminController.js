@@ -13,7 +13,7 @@ const courseAdminKey = "course-admin";
  * Notify redis server to clear cache when delete/update operation is called in database
  */
 const deleteCache = async (key) => {
-  await redisClient.del(assessmentClientKey);
+  await redisClient.del(key);
   console.log(`Del cache: ${key}`);
 };
 
@@ -21,8 +21,8 @@ const deleteCache = async (key) => {
  * Send err message back to the client
  */
 const handleErrStatus = (res, err) => {
-  const statusCode = err.response.status;
-  const message = err.response.data.data;
+  const statusCode = err?.response?.status || 400;
+  const message = err?.response?.data?.data || "";
   console.error(err);
   res.status(statusCode).send(message);
 }
@@ -74,6 +74,8 @@ const updateAssessment = async (req, res) => {
  * Delete assessment and reset assessment-question cache
  */
 const deleteAssessment = async (req, res) => {
+  let result;
+
   try {
     result = await AssessmentApis.deleteAssessment(req.body?.id);
     result = result.data;
@@ -95,18 +97,20 @@ const deleteAssessment = async (req, res) => {
  * Fetch all the assessment questions regardless of their status
  */
 const fetchAssessmentQuestions4Admin = async (req, res) => {
+  let results;
+
   try {
     const cacheResults = await redisClient.get(assessmentAdminKey);
     if (cacheResults) {
       results = JSON.parse(cacheResults);
-      console.log(`Get cache: ${key}`);
+      console.log(`Get cache: ${assessmentAdminKey}`);
     } else {
       results = await AssessmentApis.fetchAssessmentQuestions4Admin();
       results = results.data;
       if (results.length === 0) {
         throw "API returned an empty array";
       }
-      await redisClient.set(key, JSON.stringify(results));
+      await redisClient.set(assessmentAdminKey, JSON.stringify(results));
       console.log(`Set cache: ${assessmentAdminKey}`);
     }
 
@@ -163,7 +167,7 @@ const updateCourse = async (req, res) => {
     }
 
     deleteCache(key);
-    deleteAssessment(courseAllKey);
+    deleteCache(courseAllKey);
     deleteCache(courseAdminKey);
 
     res.sendStatus(200);
@@ -195,7 +199,7 @@ const deleteCourse = async (req, res) => {
     }
 
     deleteCache(key);
-    deleteAssessment(courseAllKey);
+    deleteCache(courseAllKey);
     deleteCache(courseAdminKey);
 
     res.sendStatus(200);
@@ -208,6 +212,8 @@ const deleteCourse = async (req, res) => {
  * Fetch all the courses regardless of their status
  */
 const fetchCourses4Admin = async (req, res) => {
+  let results;
+
   try {
     const cacheResults = await redisClient.get(courseAdminKey);
     if (cacheResults) {
