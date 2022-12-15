@@ -150,6 +150,7 @@ const createCourse = async (req, res) => {
  */
 const updateCourse = async (req, res) => {
   const id = req.body?.id;
+  const uuid = req.body?.uuid;
   const course = req.body;
   const key = `${courseClientKey}-${id}`;
 
@@ -167,6 +168,7 @@ const updateCourse = async (req, res) => {
     }
 
     deleteCache(key);
+    deleteCache(`${courseClientKey}-${uuid}`);
     deleteCache(courseAllKey);
     deleteCache(courseAdminKey);
 
@@ -183,6 +185,7 @@ const updateCourse = async (req, res) => {
  */
 const deleteCourse = async (req, res) => {
   const id = req.body?.id;
+  const uuid = req.body?.uuid;
   const key = `${courseClientKey}-${id}`;
 
   if (!id) {
@@ -199,6 +202,7 @@ const deleteCourse = async (req, res) => {
     }
 
     deleteCache(key);
+    deleteCache(`${courseClientKey}-${uuid}`);
     deleteCache(courseAllKey);
     deleteCache(courseAdminKey);
 
