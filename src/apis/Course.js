@@ -78,11 +78,27 @@ const fetchAllCourses4Admin = async () => {
   return apiRes;
 }
 
+/**
+ * Fetch a course regardless of its status
+ */
+const fetchCourseById4Admin = async (id) => {
+  if (!id) throw "Missing Id";
+
+  const apiRes = await axios.get(`${process.env.LOCALHOST_ENDPOINT}/admin/${type}/${version}/get`, {
+    params: {
+      id: id,
+    },
+  });
+  console.log(`Fetch course by id: ${id}`);
+  return apiRes;
+}
+
 module.exports = {
   fetchAllCourses,
   fetchCourseById,
   createCourse,
   updateCourse,
   deleteCourse,
-  fetchAllCourses4Admin
+  fetchAllCourses4Admin,
+  fetchCourseById4Admin
 };

@@ -35,7 +35,7 @@ const getAllCourses = async (req, res) => {
  * Fetch course by id
  */
 const getCourseById = async (req, res) => {
-  const id = req.query?.id;
+  const id = req.query?.id; // uuid
   const key = `${courseClientKey}-${id}`;
   let results;
   try {

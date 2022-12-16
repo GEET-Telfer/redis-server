@@ -167,10 +167,11 @@ const updateCourse = async (req, res) => {
       throw "API failed to update course";
     }
 
-    deleteCache(key);
-    deleteCache(`${courseClientKey}-${uuid}`);
-    deleteCache(courseAllKey);
-    deleteCache(courseAdminKey);
+    deleteCache(key); // delete key 
+    deleteCache(`${courseClientKey}-${uuid}`); // delete key for published course
+    deleteCache(courseAllKey); // delete key for course-list
+    deleteCache(courseAdminKey); // delete key for course-list in admin panel
+    deleteCache(`${courseAdminKey}-${id}`); // delete key for preview-course in admin panel
 
     res.sendStatus(200);
   } catch (err) {
@@ -201,10 +202,11 @@ const deleteCourse = async (req, res) => {
       throw "API failed to delete course";
     }
 
-    deleteCache(key);
-    deleteCache(`${courseClientKey}-${uuid}`);
-    deleteCache(courseAllKey);
-    deleteCache(courseAdminKey);
+    deleteCache(key); // delete key 
+    deleteCache(`${courseClientKey}-${uuid}`); // delete key for published course
+    deleteCache(courseAllKey); // delete key for course-list
+    deleteCache(courseAdminKey); // delete key for course-list in admin panel
+    deleteCache(`${courseAdminKey}-${id}`); // delete key for preview-course in admin panel
 
     res.sendStatus(200);
   } catch (err) {
@@ -240,6 +242,37 @@ const fetchCourses4Admin = async (req, res) => {
   }
 }
 
+/**
+ * Fetch a specific course by id regardless of their status
+ */
+const fetchCourseById4Admin = async (req, res) => {
+  const id = req.query?.id;
+  const key = `${courseAdminKey}-${id}`;
+  let results;
+
+  console.log(id);
+  try {
+    const cacheResults = await redisClient.get(key);
+    if (cacheResults) {
+      results = JSON.parse(cacheResults);
+      console.log(`Get cache: ${key}`);
+    } else {
+      results = await CourseApis.fetchCourseById4Admin(id);
+      results = results.data;
+      if (results.length === 0) {
+        throw "API returned an empty array";
+      }
+      await redisClient.set(key, JSON.stringify(results));
+      console.log(`Set cache: ${key}`);
+    }
+
+    res.send(results);
+  } catch (err) {
+    // res.status(404).send("Data unavailable");
+    handleErrStatus(res, err);
+  }
+}
+
 
 
 module.exports = {
@@ -250,5 +283,6 @@ module.exports = {
   updateCourse,
   deleteCourse,
   fetchAssessmentQuestions4Admin,
-  fetchCourses4Admin
+  fetchCourses4Admin,
+  fetchCourseById4Admin
 };
