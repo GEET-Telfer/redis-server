@@ -12,8 +12,8 @@ router.post("/course/create", AdminController.createCourse);
 router.post("/course/update", AdminController.updateCourse);
 router.post("/course/delete", AdminController.deleteCourse);
 
+router.get("/assessment/fetch-all", AdminController.fetchAssessmentQuestions4Admin);
+router.get("/course/fetch-all", AdminController.fetchCourses4Admin);
 
-router.post("/assessment/clear-cache", AdminController.clearAssessmentCache);
-router.post("/course/clear-cache", AdminController.clearCourseCache);
-
+router.get("/course/get", AdminController.fetchCourseById4Admin);
 module.exports = router;

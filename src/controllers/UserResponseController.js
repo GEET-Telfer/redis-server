@@ -32,9 +32,12 @@ const submitUserResponse = async (req, res) => {
         cooldown: ttl,
       });
     }
-  } catch (error) {
-    console.error(error);
-    res.status(400).send(error?.response?.data?.data);
+  } catch (err) {
+    console.log(err);
+    const statusCode = err.response.status;
+    const message = err.response.data.data;
+    console.log({status : statusCode, message : message});
+    res.status(statusCode).send(message);
   }
 };
 

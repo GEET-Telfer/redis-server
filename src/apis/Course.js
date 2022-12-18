@@ -1,9 +1,16 @@
 const axios = require("axios");
+const crypto = require('crypto');
+
+const dotenv = require("dotenv");
+dotenv.config();
 
 const type = "course";
 const version = "v1";
-const endpoint = `http://localhost/wp-json/${type}/${version}`;
+const endpoint = `${process.env.LOCALHOST_ENDPOINT}/${type}/${version}`;
 
+/**
+ * Fetch all the published courses
+ */
 const fetchAllCourses = async () => {
   const apiRes = await axios.get(`${endpoint}/find-all`);
   console.log("Request sent to the api");
@@ -11,23 +18,33 @@ const fetchAllCourses = async () => {
   return apiRes;
 };
 
-const fetchCourseById = async (id) => {
+/**
+ * Fetch course by uuid
+ */
+const fetchCourseById = async (uuid) => {
   const apiRes = await axios.get(`${endpoint}/get`, {
     params: {
-      id: id,
+      uuid: uuid,
     },
   });
-  console.log(`Fetch course by id: ${id}`);
+  console.log(`Fetch course by uuid: ${uuid}`);
   return apiRes;
 };
 
+/**
+ * Create course with random UUID
+ */
 const createCourse = async (course) => {
+  course.uuid = crypto.randomUUID();
   const apiRes = await axios.post(`${endpoint}/add`, { data: course });
 
   console.log("Crate course");
   return apiRes;
 };
 
+/**
+ * Update course with course id
+ */
 const updateCourse = async (course) => {
   const id = course?.id;
 
@@ -39,6 +56,9 @@ const updateCourse = async (course) => {
   return apiRes;
 };
 
+/**
+ * Delete course with course id
+ */
 const deleteCourse = async (id) => {
   if (!id) throw "Missing Id";
 
@@ -49,10 +69,36 @@ const deleteCourse = async (id) => {
   return apiRes;
 };
 
+/**
+ * Fetch all the courses regardless of their statuses
+ */
+const fetchAllCourses4Admin = async () => {
+  const apiRes = await axios.get(`${process.env.LOCALHOST_ENDPOINT}/admin/${type}/${version}/find-all`);
+  console.log("Request sent to the api");
+  return apiRes;
+}
+
+/**
+ * Fetch a course regardless of its status
+ */
+const fetchCourseById4Admin = async (id) => {
+  if (!id) throw "Missing Id";
+
+  const apiRes = await axios.get(`${process.env.LOCALHOST_ENDPOINT}/admin/${type}/${version}/get`, {
+    params: {
+      id: id,
+    },
+  });
+  console.log(`Fetch course by id: ${id}`);
+  return apiRes;
+}
+
 module.exports = {
   fetchAllCourses,
   fetchCourseById,
   createCourse,
   updateCourse,
   deleteCourse,
+  fetchAllCourses4Admin,
+  fetchCourseById4Admin
 };
